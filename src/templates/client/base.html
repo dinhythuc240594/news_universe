@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{% endblock %}</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="{{ url_for('static', filename='lib/css/bootstrap.min.css') }}" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='lib/css/all.min.css') }}">
+
+    <!-- jQuery -->
+    <script src="{{ url_for('static', filename='lib/js/jquery-3.6.0.min.js') }}"></script>
+    
+    <!-- Bootstrap JS -->
+    <script src="{{ url_for('static', filename='lib/js/bootstrap.bundle.min.js') }}"></script>
+    
+    <!-- custom css -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/client_style.css') }}">
+
+    <!-- custom js -->
+    <script src="{{ url_for('static', filename='js/lang.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/common.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/menu_manager.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/client.js') }}"></script>
+
+    <script>
+        MyLang.setSiteLang("{{ site }}");
+    </script>
+
+    {% block head %}
+    {% endblock %}
+    </head>
+<body>
+    <!-- Top Bar -->
+    <div class="top-bar">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-youtube"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                    </div>
+                </div>
+                <div class="col-md-6 text-end">
+                    <span class="date-time" id="currentDateTime"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Header -->
+    {% block header %}
+    {% include 'client/header.html' %}
+    {% endblock %}
+
+    <!-- Navigation -->
+    {% block navigation %}
+    {% include 'client/navigation.html' %}
+    {% endblock %}
+
+    <!-- Main Content -->
+    {% block content %}
+    {% endblock %}
+
+    <!-- Footer -->
+    {% block footer %}
+    {% include 'client/footer.html' %}
+    {% endblock %}
+
+    <!-- Scroll to Top -->
+    <button class="scroll-to-top" id="scrollTop">
+        <i class="fas fa-chevron-up"></i>
+    </button>
+
+    <!-- Newsletter Modal (VN) -->
+    <div class="modal fade" id="newsletterModalVn" tabindex="-1" aria-labelledby="newsletterModalLabelVn" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="newsletterModalLabelVn">
+                        <i class="fas fa-envelope me-2"></i>Thông báo
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="newsletterModalBodyVn">
+                    <!-- Nội dung sẽ được cập nhật bằng JavaScript -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% block scripts %}
+    {% endblock %}
+</body>
+</html>

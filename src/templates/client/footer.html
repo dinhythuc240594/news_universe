@@ -1,0 +1,52 @@
+<footer class="footer">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-3">
+                <h4><script>document.write(MyLang.getMsg('ABOUT'))</script></h4>
+                <ul class="footer-links">
+                    <li><a href="{{ url_for('client.introducing') }}"><script>document.write(MyLang.getMsg('INTRODUCING'))</script></a></li>
+                    <li><a href="{{ url_for('client.contact') }}"><script>document.write(MyLang.getMsg('CONTACT'))</script></a></li>
+                    <!-- <li><a href="#">Quảng cáo</a></li>
+                    <li><a href="#">Tuyển dụng</a></li> -->
+                </ul>
+            </div>
+            <div class="col-md-3">
+                <h4><script>document.write(MyLang.getMsg('SUPPORT'))</script></h4>
+                <ul class="footer-links">
+                    <li><a href="{{ url_for('client.guide') }}"><script>document.write(MyLang.getMsg('GUIDE'))</script></a></li>
+                    <li><a href="{{ url_for('client.term_of_service') }}"><script>document.write(MyLang.getMsg('TERM'))</script></a></li>
+                    <li><a href="{{ url_for('client.security') }}"><script>document.write(MyLang.getMsg('SECURITY'))</script></a></li>
+                    <!-- <li><a href="#">RSS</a></li> -->
+                </ul>
+            </div>
+            <div class="col-md-3">
+                <h4>Chuyên mục</h4>
+                <ul class="footer-links">
+                    {% for category in categories %}
+                        {% if category.parent_id is none%}
+                            {% if category.visible %}
+                                <li><a href="{{ url_for('client.category', category_slug=category.slug) }}">{{ category.name }}</a></li>
+                            {% endif %}
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+            </div>
+            <div class="col-md-3">
+                <h4>Theo dõi</h4>
+                <div class="social-footer">
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-youtube"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                </div>
+                <div class="newsletter" style="width: 350px;">
+                    <input type="email" id="newsletter-email-vn" placeholder="Email của bạn" class="form-control" style="width: 250px;">
+                    <button class="btn-subscribe" id="newsletter-subscribe-btn-vn"><script>document.write(MyLang.getMsg('SUBCRISE'))</script></button>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; <script>document.write(MyLang.getMsg('COPY_RIGHT'))</script></p>
+        </div>
+    </div>
+</footer>
