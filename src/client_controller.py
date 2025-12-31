@@ -10,6 +10,8 @@ import os
 from datetime import datetime, timedelta
 from werkzeug.utils import secure_filename
 import database as db
+import model
+
 
 class Controller():
 
@@ -18,12 +20,12 @@ class Controller():
     def __init__(self):
         """Khởi tạo controller"""
         self.db_session = db.get_session()
-        # self.news_model = NewsModel(self.db_session)
-        # self.category_model = CategoryModel(self.db_session)
-        # self.user_model = UserModel(self.db_session)
-        # # Model cho tin tức quốc tế
-        # self.int_news_model = InternationalNewsModel(self.db_session)
-        # self.int_category_model = InternationalCategoryModel(self.db_session)
+        self.news_model = model.NewsModel(self.db_session)
+        self.category_model = model.CategoryModel(self.db_session)
+        self.user_model = model.UserModel(self.db_session)
+        
+        # self.int_news_model = model.InternationalNewsModel(self.db_session)
+        # self.int_category_model = model.InternationalCategoryModel(self.db_session)
 
     def checkLogin(self, username, password, remember=False):
         """
