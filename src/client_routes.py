@@ -148,10 +148,16 @@ class Login(controller, base.BaseView):
     def get(self):
         
         site = request.args.get('site', 'vn')
-        
+ 
+        if site == 'en':
+            categories = self.int_category_model.get_all()
+        else:
+            categories = self.category_model.get_all()
+
         values = {
             'title': 'News - Page News' if site == 'en' else 'News - Trang Tin Tức',
             'site': site,
+            'categories': categories
         }
         return render_template('client/login.html', **values)
     

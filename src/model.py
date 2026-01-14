@@ -11,11 +11,11 @@ import utils
 
 
 class NewsModel:
-    """Model class quản lý News theo chuẩn OOP"""
+    """Model class managers News follow OOP"""
     
     def __init__(self, db_session: Session):
         """
-        Khởi tạo NewsModel
+        Initialization NewsModel
         
         Args:
             db_session: SQLAlchemy session
@@ -26,17 +26,17 @@ class NewsModel:
                created_by: int, summary: str = None, thumbnail: str = None,
                slug: str = None, status: db.NewsStatus = db.NewsStatus.DRAFT) -> db.News:
         """
-        Tạo bài viết mới
+        Create news
         
         Args:
-            title: Tiêu đề bài viết
-            content: Nội dung bài viết
-            category_id: ID danh mục
-            created_by: ID người tạo
-            summary: Tóm tắt bài viết
-            thumbnail: URL ảnh đại diện
-            slug: URL slug (tự động tạo nếu None)
-            status: Trạng thái bài viết
+            title: Title article
+            content: Content article
+            category_id: ID category
+            created_by: ID creator
+            summary: Summary article
+            thumbnail: URL avatar
+            slug: URL slug (auto generate if None)
+            status: Status article
             
         Returns:
             News object
@@ -62,11 +62,11 @@ class NewsModel:
     
     def get_by_id(self, news_id: int, include_deleted: bool = False) -> Optional[db.News]:
         """
-        Lấy bài viết theo ID
+        Get article follow ID
         
         Args:
-            news_id: ID bài viết
-            include_deleted: Nếu True, lấy cả bài đã xóa (cho admin)
+            news_id: ID article
+            include_deleted: if True, include article deleted (for admin)
         """
         query = self.db.query(db.News).filter(db.News.id == news_id)
         if not include_deleted:
@@ -74,7 +74,7 @@ class NewsModel:
         return query.first()
     
     def get_by_slug(self, slug: str) -> Optional[db.News]:
-        """Lấy bài viết theo slug (chỉ lấy bài chưa bị xóa)"""
+        """Get article follow slug (instead get article deleted)"""
         return self.db.query(db.News).filter(
             db.News.slug == slug,
             db.News.is_deleted == False
@@ -83,13 +83,13 @@ class NewsModel:
     def get_all(self, limit: int = None, offset: int = 0, 
                 status: db.NewsStatus = None, include_deleted: bool = False) -> List[db.News]:
         """
-        Lấy danh sách bài viết
+        List article
         
         Args:
-            limit: Số lượng bài viết
-            offset: Vị trí bắt đầu
-            status: Lọc theo trạng thái
-            include_deleted: Nếu True, lấy cả bài đã xóa (cho admin)
+            limit: amount article
+            offset: position start
+            status: filter status
+            include_deleted: If True, get article deleted (for admin)
             
         Returns:
             List of News objects
@@ -119,18 +119,18 @@ class NewsModel:
         include_deleted: bool = False,
     ) -> tuple[list[db.News], int]:
         """
-        Lấy danh sách bài viết theo người tạo (editor), hỗ trợ phân trang và tìm kiếm.
+        List article follow creator (editor), support pagging and search.
 
         Args:
-            creator_id: ID người tạo (editor)
-            limit: Số lượng bài viết mỗi trang
-            offset: Vị trí bắt đầu
-            status: Lọc theo trạng thái
-            search: Từ khóa tìm kiếm theo tiêu đề / tóm tắt
-            include_deleted: Nếu True, lấy cả bài đã xóa (cho admin)
+            creator_id: ID creator (editor)
+            limit: Amount article for a page
+            offset: Position start
+            status: Filter status
+            search: Keyword / summary
+            include_deleted: If True, include article deleted (for admin)
 
         Returns:
-            (items, total) - danh sách bài viết và tổng số bản ghi
+            (items, total) - list article and total
         """
         query = self.db.query(db.News).filter(db.News.created_by == creator_id)
 
@@ -161,7 +161,7 @@ class NewsModel:
         return items, total
     
     def get_published(self, limit: int = None, offset: int = 0) -> List[db.News]:
-        """Lấy danh sách bài viết đã xuất bản (chỉ lấy bài chưa bị xóa)"""
+        """List article published (just only article don't deleted)"""
         return self.get_all(
             limit=limit, 
             offset=offset, 
@@ -170,7 +170,7 @@ class NewsModel:
     
     def get_by_category(self, category_id: int, limit: int = None, 
                        offset: int = 0) -> List[db.News]:
-        """Lấy bài viết theo danh mục (chỉ lấy bài chưa bị xóa)"""
+        """List article of category (just only article don't deleted)"""
         query = self.db.query(db.News).filter(
             db.News.category_id == category_id,
             db.News.status == db.NewsStatus.PUBLISHED,
@@ -188,7 +188,7 @@ class NewsModel:
         limit: int | None = None,
         offset: int = 0,
     ) -> list[db.News]:
-        """Lấy bài viết theo nhiều danh mục (bao gồm danh mục con, chỉ lấy bài chưa bị xóa)."""
+        """List article of all child category (just only article don't deleted)"""
         if not category_ids:
             return []
 
@@ -208,7 +208,7 @@ class NewsModel:
         return query.all()
     
     def get_featured(self, limit: int = 10) -> List[db.News]:
-        """Lấy bài viết nổi bật (chỉ lấy bài chưa bị xóa)"""
+        """List article is featured (just only article don't deleted)"""
         return self.db.query(db.News).filter(
             db.News.is_featured == True,
             db.News.status == db.NewsStatus.PUBLISHED,
@@ -216,7 +216,7 @@ class NewsModel:
         ).order_by(desc(db.News.created_at)).limit(limit).all()
     
     def get_hot(self, limit: int = 10) -> List[db.News]:
-        """Lấy tin nóng (chỉ lấy bài chưa bị xóa)"""
+        """List article is hot (just only article don't deleted)"""
         return self.db.query(db.News).filter(
             db.News.is_hot == True,
             db.News.status == db.NewsStatus.PUBLISHED,
@@ -224,7 +224,7 @@ class NewsModel:
         ).order_by(desc(db.News.view_count)).limit(limit).all()
     
     def search(self, keyword: str, limit: int = 20) -> List[db.News]:
-        """Tìm kiếm bài viết (chỉ lấy bài chưa bị xóa)"""
+        """List article by keyword (just only article don't deleted)"""
         return self.db.query(db.News).filter(
             or_(
                 db.News.title.ilike(f'%{keyword}%'),
@@ -237,14 +237,14 @@ class NewsModel:
     
     def update(self, news_id: int, **kwargs) -> Optional[db.News]:
         """
-        Cập nhật bài viết
+        Update article
         
         Args:
-            news_id: ID bài viết
-            **kwargs: Các trường cần cập nhật
+            news_id: Article ID
+            **kwargs: Fields need update
             
         Returns:
-            Updated News object hoặc None
+            Updated News object or None
         """
         news = self.get_by_id(news_id)
         if not news:
@@ -260,7 +260,7 @@ class NewsModel:
         return news
     
     def approve(self, news_id: int, approved_by: int) -> Optional[db.News]:
-        """Duyệt bài viết"""
+        """Article approved"""
         return self.update(
             news_id, 
             status=db.NewsStatus.PUBLISHED,
@@ -270,12 +270,12 @@ class NewsModel:
     
     def reject(self, news_id: int, approved_by: int, reason: str = None) -> Optional[db.News]:
         """
-        Từ chối bài viết
+        Article reject
         
         Args:
-            news_id: ID bài viết
-            approved_by: ID người từ chối
-            reason: Lý do từ chối (nếu có)
+            news_id: Article ID
+            approved_by: ID user rejected
+            reason: Content reject
         """
         result = self.update(
             news_id,
@@ -283,7 +283,7 @@ class NewsModel:
             approved_by=approved_by
         )
         
-        # Lưu lý do từ chối vào bảng news_rejections
+        # Save content reject of news_rejections
         if result and reason:
             rejection = db.NewsRejection(
                 news_id=news_id,
@@ -297,7 +297,7 @@ class NewsModel:
     
     def delete(self, news_id: int) -> bool:
         """
-        Xóa mềm bài viết (soft delete) - set is_deleted = True
+        delete article (soft delete) - set is_deleted = True
         """
         news = self.get_by_id(news_id)
         if not news:
@@ -309,14 +309,14 @@ class NewsModel:
         return True
     
     def increment_view(self, news_id: int) -> None:
-        """Tăng số lượt xem"""
+        """increase views"""
         news = self.get_by_id(news_id)
         if news:
             news.view_count += 1
             self.db.commit()
     
     def _generate_slug(self, title: str) -> str:
-        """Tạo slug từ tiêu đề"""
+        """create slug from title"""
         import re
         slug = title.lower()
         slug = re.sub(r'[^\w\s-]', '', slug)
@@ -325,14 +325,14 @@ class NewsModel:
 
 
 class CategoryModel:
-    """Model class quản lý Category"""
+    """Model class management Category"""
     
     def __init__(self, db_session: Session):
         self.db = db_session
     
     def create(self, name: str, slug: str, parent_id: int = None, 
                description: str = None, icon: str = None) -> db.Category:
-        """Tạo danh mục mới"""
+        """Create category"""
         category = db.Category(
             name=name,
             slug=slug,
@@ -346,21 +346,21 @@ class CategoryModel:
         return category
     
     def get_all(self) -> List[db.Category]:
-        """Lấy tất cả danh mục"""
+        """List category"""
         return self.db.query(db.Category).filter(
             db.Category.visible == True
         ).order_by(db.Category.order_display).all()
     
     def get_by_id(self, category_id: int) -> Optional[db.Category]:
-        """Lấy danh mục theo ID"""
+        """Get category by ID"""
         return self.db.query(db.Category).filter(db.Category.id == category_id).first()
     
     def get_by_slug(self, slug: str) -> Optional[db.Category]:
-        """Lấy danh mục theo slug"""
+        """Get category by slug"""
         return self.db.query(db.Category).filter(db.Category.slug == slug).first()
 
     def get_descendant_ids(self, parent_id: int) -> list[int]:
-        """Lấy danh sách id danh mục con (mọi cấp) của parent_id."""
+        """List id category child (all level) of parent_id."""
         categories = self.db.query(db.Category.id, db.Category.parent_id).filter(
             db.Category.visible == True
         ).all()
@@ -378,36 +378,36 @@ class CategoryModel:
 
 
 class UserModel:
-    """Model class quản lý User"""
+    """Model class management User"""
     
     def __init__(self, db_session: Session):
         self.db = db_session
     
     def get_by_username(self, username: str) -> Optional[db.User]:
-        """Lấy user theo username"""
+        """Get user follow username"""
         return self.db.query(db.User).filter(db.User.username == username).first()
     
     def get_by_email(self, email: str) -> Optional[db.User]:
-        """Lấy user theo email"""
+        """Get user follow email"""
         return self.db.query(db.User).filter(db.User.email == email).first()
     
     def get_by_id(self, user_id: int) -> Optional[db.User]:
-        """Lấy user theo ID"""
+        """Get user follow ID"""
         return self.db.query(db.User).filter(db.User.id == user_id).first()
     
     def create(self, username: str, email: str, password: str, 
                full_name: str = None, phone: str = None, 
                role: db.UserRole = db.UserRole.USER) -> db.User:
         """
-        Tạo user mới
+        Create new user
         
         Args:
-            username: Tên đăng nhập
+            username: user name
             email: Email
-            password: Mật khẩu (sẽ được hash)
-            full_name: Họ tên đầy đủ
-            phone: Số điện thoại
-            role: Vai trò (mặc định là USER)
+            password: Password hashed
+            full_name: Get full name
+            phone: Phone
+            role: Role (default is USER)
             
         Returns:
             User object
@@ -429,14 +429,14 @@ class UserModel:
     
     def authenticate(self, username: str, password: str) -> Optional[db.User]:
         """
-        Xác thực user với username và password
+        Valid user with username and password
         
         Args:
-            username: Tên đăng nhập hoặc email
-            password: Mật khẩu
+            username: username or password
+            password: password
             
         Returns:
-            User object nếu đúng, None nếu sai
+            User object if true, None if wrong
         """
         
         # Try username first
@@ -446,9 +446,9 @@ class UserModel:
         if not user:
             user = self.get_by_email(username)
         
-        # Kiểm tra tài khoản bị khóa trước khi kiểm tra mật khẩu
+        # Check account locked before check password
         if user and not user.is_active:
-            return None  # Tài khoản bị khóa, không cho đăng nhập
+            return None  # account locked, deny sign-in
         
         if user and user.is_active and utils.verify_password(user.password_hash, password):
             return user
@@ -457,13 +457,13 @@ class UserModel:
     
     def is_locked_user(self, username: str) -> bool:
         """
-        Kiểm tra xem tài khoản có bị khóa không
+        check account locked
         
         Args:
-            username: Tên đăng nhập hoặc email
+            username: user name or email
             
         Returns:
-            True nếu tài khoản bị khóa, False nếu không
+            True nếu if locked, else False
         """
         # Try username first
         user = self.get_by_username(username)
@@ -479,18 +479,18 @@ class UserModel:
 
 
 class InternationalNewsModel:
-    """Model class quản lý NewsInternational (tin quốc tế tiếng Anh)"""
+    """Model class management NewsInternational (news international by English)"""
 
     def __init__(self, db_session: Session):
         self.db = db_session
 
     def get_by_id(self, news_id: int, include_deleted: bool = False) -> Optional[db.NewsInternational]:
         """
-        Lấy bài viết quốc tế theo ID
+        Get article by ID
         
         Args:
-            news_id: ID bài viết
-            include_deleted: Nếu True, lấy cả bài đã xóa (cho admin)
+            news_id: ID article
+            include_deleted: if True, include article deleted (for admin)
         """
         query = self.db.query(db.NewsInternational).filter(db.NewsInternational.id == news_id)
         if not include_deleted:
@@ -498,7 +498,7 @@ class InternationalNewsModel:
         return query.first()
 
     def get_by_slug(self, slug: str) -> Optional[db.NewsInternational]:
-        """Lấy bài viết quốc tế theo slug (chỉ lấy bài chưa bị xóa)"""
+        """Get article by slug (just only article don't delete)"""
         return (
             self.db.query(db.NewsInternational)
             .filter(

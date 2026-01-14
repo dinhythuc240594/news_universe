@@ -24,8 +24,8 @@ class Controller():
         self.category_model = model.CategoryModel(self.db_session)
         self.user_model = model.UserModel(self.db_session)
         
-        # self.int_news_model = model.InternationalNewsModel(self.db_session)
-        # self.int_category_model = model.InternationalCategoryModel(self.db_session)
+        self.int_news_model = model.InternationalNewsModel(self.db_session)
+        self.int_category_model = model.InternationalCategoryModel(self.db_session)
 
     def checkLogin(self, username, password, remember=False):
         """
@@ -33,34 +33,36 @@ class Controller():
         """
 
         site = session.get('site')
-        if site == 'en':
-            categories = self.int_category_model.get_all()
+
+        # check status locked of account before authentication
+        if self.user_model.is_locked_user(username):
+            if site == 'en':
+                flash('Account has been locked. Please contact administrator', 'error')
+                return redirect(url_for('client.en_user_login'))
+            else:
+                flash('Tài khoản đã bị khóa. Vui lòng liên hệ quản trị viên', 'error')
+                return redirect(url_for('client.user_login'))
+        
+        user = self.user_model.authenticate(username, password)
+        
+        if user and user.is_active and user.role == db.UserRole.USER:
+            session['user_id'] = user.id
+            session['username'] = user.username
+            session['full_name'] = user.full_name or user.username
+            session['role'] = user.role.value
+            
+            # Nếu chọn "Ghi nhớ đăng nhập", set session permanent
+            if remember:
+                session.permanent = True
+            else:
+                session.permanent = False
+
+            flash('Đăng nhập thành công', 'success')
+            return redirect(url_for('client.index'))
         else:
-            categories = self.category_model.get_all()
-            
-        # # Kiểm tra tài khoản bị khóa trước khi xác thực
-        # if self.user_model.is_locked_user(username):
-        #     if site == 'en':
-        #         flash('Account has been locked. Please contact administrator', 'error')
-        #         return redirect(url_for('client.en_user_login'))
-        #     else:
-        #         flash('Tài khoản đã bị khóa. Vui lòng liên hệ quản trị viên', 'error')
-        #         return redirect(url_for('client.user_login'))
-        
-        # user = self.user_model.authenticate(username, password)
-        
-        # if user and user.is_active and user.role == db.UserRole.USER:
-        #     session['user_id'] = user.id
-        #     session['username'] = user.username
-        #     session['full_name'] = user.full_name or user.username
-        #     session['role'] = user.role.value
-            
-        #     flash('Đăng nhập thành công', 'success')
-        #     return redirect(url_for('client.index'))
-        # else:
-        #     print('Tên đăng nhập hoặc mật khẩu không đúng')
-        #     flash('Tên đăng nhập hoặc mật khẩu không đúng', 'error')
-        #     return redirect(url_for('client.user_login'))
+            print('Tên đăng nhập hoặc mật khẩu không đúng')
+            flash('Tên đăng nhập hoặc mật khẩu không đúng', 'error')
+            return redirect(url_for('client.user_login'))
 
 
     def register(self, site='vn'):
