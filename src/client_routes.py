@@ -3,7 +3,7 @@
 client router - define routes for client
 """
 
-from flask import Blueprint, render_template, request, jsonify, abort, make_response
+from flask import Blueprint, render_template, request, jsonify, abort, make_response, session
 
 import base
 import client_controller
@@ -24,7 +24,7 @@ class Home(base.BaseView):
     
     def get(self):
         
-        site = request.args.get('site', 'vn')
+        site = session.get('site')
         
         values = {
             'title': 'News - Page News' if site == 'en' else 'News - Trang Tin Tức',
@@ -147,7 +147,7 @@ class Login(controller, base.BaseView):
     
     def get(self):
         
-        site = request.args.get('site', 'vn')
+        site = session.get('site')
  
         if site == 'en':
             categories = self.int_category_model.get_all()
@@ -162,31 +162,51 @@ class Login(controller, base.BaseView):
         return render_template('client/login.html', **values)
     
     def post(self):
-        username = request.form.get('username')
-        password = request.form.get('password')
-        remember = True if request.form.get('remember') == 'on' else False
-
-        self.checkLogin(username, password, remember=remember)
+        self.checkLogin()
 
 
 class Register(controller, base.BaseView):
     
     def get(self):
         
-        site = request.args.get('site', 'vn')
+        site = session.get('site')
+        
+        if site == 'en':
+            categories = self.int_category_model.get_all()
+        else:
+            categories = self.category_model.get_all()
         
         values = {
-            'title': 'News - Page News' if site == 'en' else 'News - Trang Tin Tức',
+            'title': 'Register - Page News' if site == 'en' else 'Đăng ký - Trang Tin Tức',
             'site': site,
+            'categories': categories
         }
-        return render_template('client/login.html', **values)
+        return render_template('client/register.html', **values)
     
     def post(self):
-        username = request.form.get('username')
-        password = request.form.get('password')
-        remember = True if request.form.get('remember') == 'on' else False
+        self.register()
 
-        self.checkLogin(username, password, remember=remember)
+
+class ForgotPassword(controller, base.BaseView):
+    
+    def get(self):
+        
+        site = session.get('site')
+        
+        if site == 'en':
+            categories = self.int_category_model.get_all()
+        else:
+            categories = self.category_model.get_all()
+        
+        values = {
+            'title': 'Forgot Password - Page News' if site == 'en' else 'Lấy lại mật khẩu - Trang Tin Tức',
+            'site': site,
+            'categories': categories
+        }
+        return render_template('client/forgot_password.html', **values)
+    
+    def post(self):
+        self.forgot_password()
 
 
 class Introducing(base.BaseView):
@@ -229,7 +249,8 @@ client_bp.add_url_rule('/latest-news', 'latestnews', LatestNews.as_view('latestn
 client_bp.add_url_rule('/featured-news', 'featurednews', FeaturedNews.as_view('featurednews'))
 client_bp.add_url_rule('/hot-news', 'hotnews', HotNews.as_view('hotnews'))
 client_bp.add_url_rule('/signin', 'login', Login.as_view('login'))
-client_bp.add_url_rule('/signup', 'register', Login.as_view('register'))
+client_bp.add_url_rule('/signup', 'register', Register.as_view('register'))
+client_bp.add_url_rule('/forgot_password', 'forgot_password', ForgotPassword.as_view('forgot_password'))
 client_bp.add_url_rule('/introducing', 'introducing', Introducing.as_view('introducing'))
 client_bp.add_url_rule('/security', 'security', Security.as_view('security'))
 client_bp.add_url_rule('/term', 'term_of_service', Term.as_view('term_of_service'))

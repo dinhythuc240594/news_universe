@@ -2,8 +2,9 @@
 Main application file - initialization for Flask app và register routes
 """
 from dotenv import load_dotenv
-from flask import Flask, request
+from flask import Flask, request, session
 from datetime import datetime, timezone
+from flask_babel import Babel
 import pytz
 import re
 
@@ -28,6 +29,13 @@ def create_app():
     app = Flask(__name__)
     app.config.from_object(envConfig)
 
+    # Set default configuration
+    app.config['BABEL_DEFAULT_LOCALE'] = 'vn'
+    app.config['LANGUAGES'] = ['vn', 'en'] # Supported languages
+
+    # Initialize Babel
+    babel = Babel(app)
+
     # initialization database
     init_db()
 
@@ -48,15 +56,14 @@ def create_app():
     for rule in app.url_map.iter_rules():
         print(f"{rule.rule} -> {rule.endpoint} [{', '.join(rule.methods)}]")
     print("="*50 + "\n")
-    
-    # Helper function để xác định site từ request path
-    def _get_site_from_request():
-        """Xác định site (vn/en) từ request path"""
-        path = request.path if request else ''
-        if path.startswith('/en'):
-            return 'en'
-        return 'vn'
-    
+
+    #### 2026-01-15 - add function getlocale to separate site ####
+    @babel.localeselector
+    def get_locale():
+        if request.args.get('lang'):
+            session['lang'] = request.args.get('lang')
+        return session.get('lang', 'vn')
+
     # Đăng ký Jinja2 filters
     @app.template_filter('datetime_format')
     def datetime_format_filter(dt):
@@ -65,7 +72,7 @@ def create_app():
             return ''
         
         # Xác định site từ request path
-        site = _get_site_from_request()
+        site = session['site']
         
         # Thiết lập time_format và time_zone theo site
         time_format = '%d-%m-%Y %H:%M'
@@ -87,10 +94,10 @@ def create_app():
     def timeago_filter(dt):
         """Format datetime thành 'X giờ trước', 'X ngày trước'"""
         if dt is None:
-            return "Vừa xong" if _get_site_from_request() == 'vn' else "Just now"
+            return "Vừa xong" if session['site'] == 'vn' else "Just now"
         
         # Xác định site từ request path
-        site = _get_site_from_request()
+        site = session['site']
         
         # Đảm bảo datetime có timezone
         if dt.tzinfo is None:

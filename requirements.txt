@@ -7,3 +7,4 @@ pytz==2024.1
 feedparser==6.0.11
 requests==2.32.3
 beautifulsoup4==4.12.3
+flask_babel

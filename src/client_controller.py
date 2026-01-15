@@ -27,12 +27,15 @@ class Controller():
         self.int_news_model = model.InternationalNewsModel(self.db_session)
         self.int_category_model = model.InternationalCategoryModel(self.db_session)
 
-    def checkLogin(self, username, password, remember=False):
+    def checkLogin(self):
         """
         Check login for user
         """
-
+        
         site = session.get('site')
+        username = request.form.get('username')
+        password = request.form.get('password')
+        remember = True if request.form.get('remember') == 'on' else False
 
         # check status locked of account before authentication
         if self.user_model.is_locked_user(username):
@@ -65,77 +68,118 @@ class Controller():
             return redirect(url_for('client.user_login'))
 
 
-    def register(self, site='vn'):
+    def register(self):
         """
         Trang đăng ký cho user
-        Route: GET /register
         Route: POST /register
         """
+
+        from utils import validate_email, validate_password, validate_phone
         
-        if site == 'en':
-            categories = self.int_category_model.get_all()
+        # Validation
+        errors = []
+        
+        username = request.form.get('username', '').strip()
+        email = request.form.get('email', '').strip()
+        password = request.form.get('password', '')
+        confirm_password = request.form.get('confirm_password', '')
+        full_name = request.form.get('full_name', '').strip()
+        phone = request.form.get('phone', '').strip()
+        
+        # Validate username
+        if not username:
+            errors.append('Tên đăng nhập không được để trống')
+        elif len(username) < 3:
+            errors.append('Tên đăng nhập phải có ít nhất 3 ký tự')
+        elif self.user_model.get_by_username(username):
+            errors.append('Tên đăng nhập đã tồn tại')
+        
+        # Validate email
+        if not validate_email(email):
+            errors.append('Email không đúng định dạng')
+        elif self.user_model.get_by_email(email):
+            errors.append('Email đã được sử dụng')
+        
+        # Validate phone
+        phone_valid, phone_error = validate_phone(phone)
+        if not phone_valid:
+            errors.append(phone_error)
+        
+        # Validate password
+        password_valid, password_error = validate_password(password)
+        if not password_valid:
+            errors.append(password_error)
+        elif password != confirm_password:
+            errors.append('Mật khẩu xác nhận không khớp')
+        
+        if errors:
+            for error in errors:
+                flash(error, 'error')
         else:
-            categories = self.category_model.get_all()
+            try:
+                # Clean phone number
+                phone_clean = phone.replace(' ', '').replace('-', '').replace('(', '').replace(')', '')
+                
+                user = self.user_model.create(
+                    username=username,
+                    email=email,
+                    password=password,
+                    full_name=full_name if full_name else None,
+                    phone=phone_clean,
+                    role=db.UserRole.USER
+                )
+                
+                flash('Đăng ký thành công! Vui lòng đăng nhập', 'success')
+                return redirect(url_for('client.user_login'))
+            except Exception as e:
+                flash('Có lỗi xảy ra khi đăng ký. Vui lòng thử lại', 'error')
+
+    def forgot_password(self):
+        """
+        Trang quên mật khẩu - Yêu cầu reset
+        Route: POST /forgot-password
+        """
+        email = request.form.get('email', '').strip().lower()
+        site = session.get('site')
+
+        from utils import validate_email
+        from email_utils import generate_token, send_password_reset_email
         
-        if request.method == 'POST':
-            username = request.form.get('username', '').strip()
-            email = request.form.get('email', '').strip()
-            password = request.form.get('password', '')
-            confirm_password = request.form.get('confirm_password', '')
-            full_name = request.form.get('full_name', '').strip()
-            phone = request.form.get('phone', '').strip()
+        # Validation
+        if not email:
+            flash('Email không được để trống' if site == 'vn' else 'Email is required', 'error')
+        elif not validate_email(email):
+            flash('Email không đúng định dạng' if site == 'vn' else 'Invalid email format', 'error')
+        else:
+            # Tìm user
+            user = self.user_model.get_by_email(email)
             
-            from utils import validate_email, validate_password, validate_phone
+            if user:
+                # Tạo token reset
+                reset_token = generate_token()
+                expires_at = datetime.utcnow() + timedelta(hours=1)  # Token hết hạn sau 1 giờ
+                
+                # Vô hiệu hóa các token cũ của user này
+                old_tokens = self.db_session.query(db.PasswordResetToken).filter(
+                    db.PasswordResetToken.user_id == user.id,
+                    db.PasswordResetToken.used == False
+                ).all()
+                for old_token in old_tokens:
+                    old_token.used = True
+                
+                # Tạo token mới
+                reset_token_obj = db.PasswordResetToken(
+                    user_id=user.id,
+                    token=reset_token,
+                    expires_at=expires_at
+                )
+                self.db_session.add(reset_token_obj)
+                self.db_session.commit()
+                
+                # Gửi email reset
+                send_password_reset_email(user.email, reset_token, site)
             
-            # Validation
-            errors = []
-            
-            # Validate username
-            if not username:
-                errors.append('Tên đăng nhập không được để trống')
-            elif len(username) < 3:
-                errors.append('Tên đăng nhập phải có ít nhất 3 ký tự')
-            elif self.user_model.get_by_username(username):
-                errors.append('Tên đăng nhập đã tồn tại')
-            
-            # Validate email
-            if not validate_email(email):
-                errors.append('Email không đúng định dạng')
-            elif self.user_model.get_by_email(email):
-                errors.append('Email đã được sử dụng')
-            
-            # Validate phone
-            phone_valid, phone_error = validate_phone(phone)
-            if not phone_valid:
-                errors.append(phone_error)
-            
-            # Validate password
-            password_valid, password_error = validate_password(password)
-            if not password_valid:
-                errors.append(password_error)
-            elif password != confirm_password:
-                errors.append('Mật khẩu xác nhận không khớp')
-            
-            if errors:
-                for error in errors:
-                    flash(error, 'error')
-            else:
-                try:
-                    # Clean phone number
-                    phone_clean = phone.replace(' ', '').replace('-', '').replace('(', '').replace(')', '')
-                    
-                    user = self.user_model.create(
-                        username=username,
-                        email=email,
-                        password=password,
-                        full_name=full_name if full_name else None,
-                        phone=phone_clean,
-                        role=db.UserRole.USER
-                    )
-                    
-                    flash('Đăng ký thành công! Vui lòng đăng nhập', 'success')
-                    return redirect(url_for('client.user_login'))
-                except Exception as e:
-                    flash('Có lỗi xảy ra khi đăng ký. Vui lòng thử lại', 'error')
-        
-        return render_template(f'client/{site}/register.html', categories=categories)
+            # Luôn hiển thị thông báo thành công (bảo mật)
+            success_msg = 'Nếu email tồn tại trong hệ thống, chúng tôi đã gửi link đặt lại mật khẩu đến email của bạn.' if site == 'vn' else 'If the email exists in our system, we have sent a password reset link to your email.'
+            flash(success_msg, 'success')
+            return redirect(url_for('client.user_login', site=site))

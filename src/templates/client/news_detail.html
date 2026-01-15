@@ -1,7 +1,7 @@
-{% extends '/client/vn/base.html' %}
+{% extends '/client/base.html' %}
 {% block title %}{{ category.name }} - VnNews{% endblock %}
 {% block head %}
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style_client.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/client_style.css') }}">
 {% endblock %}
 {% block content %}
     <!-- Main Content -->
@@ -250,7 +250,7 @@
 {% endblock %}
 
 {% block scripts %}
-{% include 'client/vn/hot_news.html' %}
+{% include 'client/hot_news.html' %}
 <script>
     // Handle Save/Unsave News
     const saveNewsBtn = document.getElementById('saveNewsBtn');
