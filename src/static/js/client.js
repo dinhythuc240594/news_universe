@@ -152,37 +152,37 @@ UI_CLIENT = {
     // Get weather icon and description from weather code (WMO Weather interpretation codes)
     getWeatherInfo: function(code) {
         const weatherMap = {
-            0: { icon: 'fas fa-sun', description: site == 'en' ? 'Sunny' : 'Trời nắng' },
-            1: { icon: 'fas fa-sun', description: site == 'en' ? 'Sunny' : 'Trời quang' },
-            2: { icon: 'fas fa-cloud-sun', description: site == 'en' ? 'Cloudy' : 'Ít mây' },
-            3: { icon: 'fas fa-cloud', description: site == 'en' ? 'Cloudy' : 'Nhiều mây' },
-            45: { icon: 'fas fa-smog', description: site == 'en' ? 'Fog' : 'Sương mù' },
-            48: { icon: 'fas fa-smog', description: site == 'en' ? 'Fog' : 'Sương mù' },
-            51: { icon: 'fas fa-cloud-rain', description: site == 'en' ? 'Rain' : 'Mưa nhẹ' },
-            53: { icon: 'fas fa-cloud-rain', description: site == 'en' ? 'Rain' : 'Mưa vừa' },
-            55: { icon: 'fas fa-cloud-rain', description: site == 'en' ? 'Rain' : 'Mưa nặng' },
-            56: { icon: 'fas fa-cloud-rain', description: site == 'en' ? 'Rain' : 'Mưa đá nhẹ' },
-            57: { icon: 'fas fa-cloud-rain', description: site == 'en' ? 'Rain' : 'Mưa đá nặng' },
-            61: { icon: 'fas fa-cloud-showers-heavy', description: site == 'en' ? 'Rain' : 'Mưa nhẹ' },
-            63: { icon: 'fas fa-cloud-showers-heavy', description: site == 'en' ? 'Rain' : 'Mưa vừa' },
-            65: { icon: 'fas fa-cloud-showers-heavy', description: site == 'en' ? 'Rain' : 'Mưa nặng' },
-            66: { icon: 'fas fa-cloud-rain', description: site == 'en' ? 'Rain' : 'Mưa đá nhẹ' },
-            67: { icon: 'fas fa-cloud-rain', description: site == 'en' ? 'Rain' : 'Mưa đá nặng' },
-            71: { icon: 'fas fa-snowflake', description: site == 'en' ? 'Snow' : 'Tuyết nhẹ' },
-            73: { icon: 'fas fa-snowflake', description: site == 'en' ? 'Snow' : 'Tuyết vừa' },
-            75: { icon: 'fas fa-snowflake', description: site == 'en' ? 'Snow' : 'Tuyết nặng' },
-            77: { icon: 'fas fa-snowflake', description: site == 'en' ? 'Snow' : 'Hạt tuyết' },
-            80: { icon: 'fas fa-cloud-showers-heavy', description: site == 'en' ? 'Rain' : 'Mưa rào nhẹ' },
-            81: { icon: 'fas fa-cloud-showers-heavy', description: site == 'en' ? 'Rain' : 'Mưa rào vừa' },
-            82: { icon: 'fas fa-cloud-showers-heavy', description: site == 'en' ? 'Rain' : 'Mưa rào nặng' },
-            85: { icon: 'fas fa-snowflake', description: site == 'en' ? 'Snow' : 'Mưa tuyết nhẹ' },
-            86: { icon: 'fas fa-snowflake', description: site == 'en' ? 'Snow' : 'Mưa tuyết nặng' },
-            95: { icon: 'fas fa-bolt', description: site == 'en' ? 'Thunder' : 'Dông' },
-            96: { icon: 'fas fa-bolt', description: site == 'en' ? 'Thunder' : 'Dông có mưa đá' },
-            99: { icon: 'fas fa-bolt', description: site == 'en' ? 'Thunder' : 'Dông có mưa đá nặng' },
-    };
-    
-    return weatherMap[code] || { icon: 'fas fa-cloud', description: site == 'en' ? 'Cloudy' : 'Nhiều mây' };
-}
+            0: { icon: 'fas fa-sun', description: MyLang.getMsg('MSG_SUN') },
+            1: { icon: 'fas fa-sun', description: MyLang.getMsg('MSG_CLEAR_SKY') },
+            2: { icon: 'fas fa-cloud-sun', description: MyLang.getMsg('MSG_FEW_CLOUDY') },
+            3: { icon: 'fas fa-cloud', description: MyLang.getMsg('MSG_MANY_CLOUDY') },
+            45: { icon: 'fas fa-smog', description: MyLang.getMsg('MSG_FOG') },
+            48: { icon: 'fas fa-smog', description: MyLang.getMsg('MSG_FOG') },
+            51: { icon: 'fas fa-cloud-rain', description: MyLang.getMsg('MSG_LIGHT_RAIN') },
+            53: { icon: 'fas fa-cloud-rain', description: MyLang.getMsg('MSG_MODERATE_RAIN') },
+            55: { icon: 'fas fa-cloud-rain', description: MyLang.getMsg('MSG_HEAVY_RAIN') },
+            56: { icon: 'fas fa-cloud-rain', description: MyLang.getMsg('MSG_LIGHT_HAIL') },
+            57: { icon: 'fas fa-cloud-rain', description: MyLang.getMsg('MSG_HEAVY_HAIL') },
+            61: { icon: 'fas fa-cloud-showers-heavy', description: MyLang.getMsg('MSG_LIGHT_RAIN') },
+            63: { icon: 'fas fa-cloud-showers-heavy', description: MyLang.getMsg('MSG_MODERATE_RAIN') },
+            65: { icon: 'fas fa-cloud-showers-heavy', description: MyLang.getMsg('MSG_HEAVY_RAIN') },
+            66: { icon: 'fas fa-cloud-rain', description: MyLang.getMsg('MSG_LIGHT_HAIL') },
+            67: { icon: 'fas fa-cloud-rain', description: MyLang.getMsg('MSG_HEAVY_HAIL') },
+            71: { icon: 'fas fa-snowflake', description: MyLang.getMsg('MSG_LIGHT_SNOW') },
+            73: { icon: 'fas fa-snowflake', description: MyLang.getMsg('MSG_MODERATE_SNOW') },
+            75: { icon: 'fas fa-snowflake', description: MyLang.getMsg('MSG_HEAVY_SNOW') },
+            77: { icon: 'fas fa-snowflake', description: MyLang.getMsg('MSG_SNOW_FLAKES') },
+            80: { icon: 'fas fa-cloud-showers-heavy', description: MyLang.getMsg('MSG_LIGHT_SHOWER') },
+            81: { icon: 'fas fa-cloud-showers-heavy', description: MyLang.getMsg('MSG_MODERATE_SHOWER') },
+            82: { icon: 'fas fa-cloud-showers-heavy', description: MyLang.getMsg('MSG_HEAVY_SHOWER') },
+            85: { icon: 'fas fa-snowflake', description: MyLang.getMsg('MSG_LIGHT_SNOW_FALL') },
+            86: { icon: 'fas fa-snowflake', description: MyLang.getMsg('MSG_HEAVY_SNOW_FALL') },
+            95: { icon: 'fas fa-bolt', description: MyLang.getMsg('MSG_THUNDER') },
+            96: { icon: 'fas fa-bolt', description: MyLang.getMsg('MSG_THUNDER_HAIL') },
+            99: { icon: 'fas fa-bolt', description: MyLang.getMsg('MSG_THUNDER_HEAVY_HAIL') },
+        };
+        
+        return weatherMap[code] || { icon: 'fas fa-cloud', description: MyLang.getMsg('MSG_MANY_CLOUDY') };
+    }
 
 }
