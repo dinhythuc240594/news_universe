@@ -24,7 +24,7 @@ class Home(base.BaseView):
     
     def get(self):
         
-        site = session.get('site')
+        site = self.site
         
         values = {
             'title': 'News - Page News' if site == 'en' else 'News - Trang Tin Tức',

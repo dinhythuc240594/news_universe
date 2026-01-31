@@ -32,9 +32,10 @@ def create_app():
     # Set default configuration
     app.config['BABEL_DEFAULT_LOCALE'] = 'vn'
     app.config['LANGUAGES'] = ['vn', 'en'] # Supported languages
-
-    # Initialize Babel
-    babel = Babel(app)
+    
+    # # Initialize Babel
+    # babel = Babel(app)
+    # babel.init_app(app, locale_selector=get_locale)
 
     # initialization database
     init_db()
@@ -56,13 +57,6 @@ def create_app():
     for rule in app.url_map.iter_rules():
         print(f"{rule.rule} -> {rule.endpoint} [{', '.join(rule.methods)}]")
     print("="*50 + "\n")
-
-    #### 2026-01-15 - add function getlocale to separate site ####
-    @babel.localeselector
-    def get_locale():
-        if request.args.get('lang'):
-            session['lang'] = request.args.get('lang')
-        return session.get('lang', 'vn')
 
     # Đăng ký Jinja2 filters
     @app.template_filter('datetime_format')
