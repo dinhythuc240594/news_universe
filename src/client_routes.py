@@ -215,16 +215,42 @@ class Introducing(base.BaseView):
         pass
 
 
-class Security(base.BaseView):
+class Security(controller, base.BaseView):
+    
+    def get(self):
+
+        site = session.get('site')
+        
+        if site == 'en':
+            categories = self.int_category_model.get_all()
+        else:
+            categories = self.category_model.get_all()
+
+        values = {
+            'title': 'Security - Page News' if site == 'en' else 'Bảo mật - Trang Tin Tức',
+            'site': site,
+            'categories': categories
+        }
+        return render_template('client/security.html', **values)
+
+
+class Term(controller, base.BaseView):
     
     def get(self):
         pass
+        # site = session.get('site')
+        
+        # if site == 'en':
+        #     categories = self.int_category_model.get_all()
+        # else:
+        #     categories = self.category_model.get_all()
 
-
-class Term(base.BaseView):
-    
-    def get(self):
-        pass
+        # values = {
+        #     'title': 'Term - Page News' if site == 'en' else 'Điều khoản - Trang Tin Tức',
+        #     'site': site,
+        #     'categories': categories
+        # }
+        # return render_template('client/term_of_service.html', **values)
 
 
 class Contact(base.BaseView):
