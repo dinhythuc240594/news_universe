@@ -64,12 +64,15 @@ class Categories(base.BaseView):
     
     def get(self):
         
-        site = request.args.get('site', 'vn')
-        limit = request.args.get('limit', 10)
-        offset = request.args.get('offset', 10)
+        # site = request.args.get('site', 'vn')
+        # limit = request.args.get('limit', 10)
+        # offset = request.args.get('offset', 10)
         
         data = {
             'success': True,
+            # 'site': site,
+            # 'limit': limit,
+            # 'offset': offset,
             'data': [],
         }
         
@@ -95,9 +98,9 @@ class LatestNews(base.BaseView):
     
     def get(self):
         
-        site = request.args.get('site', 'vn')
-        limit = request.args.get('limit', 10)
-        offset = request.args.get('offset', 10)
+        # site = request.args.get('site', 'vn')
+        # limit = request.args.get('limit', 10)
+        # offset = request.args.get('offset', 10)
         
         data = {
             'success': True,
@@ -113,9 +116,9 @@ class FeaturedNews(base.BaseView):
     
     def get(self):
         
-        site = request.args.get('site', 'vn')
-        limit = request.args.get('limit', 10)
-        offset = request.args.get('offset', 10)
+        # site = request.args.get('site', 'vn')
+        # limit = request.args.get('limit', 10)
+        # offset = request.args.get('offset', 10)
         
         data = {
             'success': True,
@@ -131,7 +134,7 @@ class HotNews(base.BaseView):
     
     def get(self):
         
-        site = request.args.get('site', 'vn')
+        # site = request.args.get('site', 'vn')
         
         data = {
             'success': True,
@@ -209,10 +212,22 @@ class ForgotPassword(controller, base.BaseView):
         self.forgot_password()
 
 
-class Introducing(base.BaseView):
+class Introducing(controller, base.BaseView):
     
     def get(self):
-        pass
+        site = session.get('site')
+        
+        if site == 'en':
+            categories = self.int_category_model.get_all()
+        else:
+            categories = self.category_model.get_all()
+
+        values = {
+            'title': 'Introducing - Page News' if site == 'en' else 'Giới Thiệu - Trang Tin Tức',
+            'site': site,
+            'categories': categories
+        }
+        return render_template('client/introducing.html', **values)
 
 
 class Security(controller, base.BaseView):
@@ -237,32 +252,55 @@ class Security(controller, base.BaseView):
 class Term(controller, base.BaseView):
     
     def get(self):
-        pass
-        # site = session.get('site')
+        site = session.get('site')
         
-        # if site == 'en':
-        #     categories = self.int_category_model.get_all()
-        # else:
-        #     categories = self.category_model.get_all()
+        if site == 'en':
+            categories = self.int_category_model.get_all()
+        else:
+            categories = self.category_model.get_all()
 
-        # values = {
-        #     'title': 'Term - Page News' if site == 'en' else 'Điều khoản - Trang Tin Tức',
-        #     'site': site,
-        #     'categories': categories
-        # }
-        # return render_template('client/term_of_service.html', **values)
+        values = {
+            'title': 'Term - Page News' if site == 'en' else 'Điều khoản - Trang Tin Tức',
+            'site': site,
+            'categories': categories
+        }
+        return render_template('client/term_of_service.html', **values)
 
 
-class Contact(base.BaseView):
+class Contact(controller, base.BaseView):
     
     def get(self):
-        pass
+        site = session.get('site')
+        
+        if site == 'en':
+            categories = self.int_category_model.get_all()
+        else:
+            categories = self.category_model.get_all()
+
+        values = {
+            'title': 'Contact - Page News' if site == 'en' else 'Liên Hệ - Trang Tin Tức',
+            'site': site,
+            'categories': categories
+        }
+        return render_template('client/contact.html', **values)
 
 
-class Guide(base.BaseView):
+class Guide(controller, base.BaseView):
     
     def get(self):
-        pass
+        site = session.get('site')
+        
+        if site == 'en':
+            categories = self.int_category_model.get_all()
+        else:
+            categories = self.category_model.get_all()
+
+        values = {
+            'title': 'Guide - Page News' if site == 'en' else 'Hướng dẫn - Trang Tin Tức',
+            'site': site,
+            'categories': categories
+        }
+        return render_template('client/guide.html', **values)
 
 
 client_bp.add_url_rule('/', 'home0', Home.as_view('home0'))

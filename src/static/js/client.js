@@ -298,3 +298,11 @@ UI_CLIENT = {
 
 };
 
+TEMPLATE_CLIENT = {
+    
+    loadSectionFeatureNews: function(){
+        
+    }
+
+};
+
