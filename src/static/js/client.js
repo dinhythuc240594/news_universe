@@ -3,8 +3,9 @@ UI_CLIENT = {
 
     SITE: localStorage.getItem('site') || 'vn',
 
-    homeMainContent: function(){
-        updateDateTime();
+    homeMainContent: async function(){
+        UI_CLIENT.updateDateTime();
+        await UI_CLIENT.loadDynamicMenu();
     },
 
     updateDateTime: function() {
@@ -185,8 +186,8 @@ UI_CLIENT = {
         return weatherMap[code] || { icon: 'fas fa-cloud', description: MyLang.getMsg('MSG_MANY_CLOUDY') };
     },
 
-    loadDynamicMenu: function(){
-        const menuTree = menuManager.buildMenuTree();
+    loadDynamicMenu: async function(){
+        const menuTree = await menuManager.buildMenuTree();
         console.log('Menu Tree:', menuTree);
         let menuHtml = '';
         
@@ -195,14 +196,14 @@ UI_CLIENT = {
             console.log(`Menu: ${menu.name}, Has Children: ${hasChildren}, Children:`, menu.children);
             
             const icon = menu.icon ? '<i class="'+ menu.icon +'"></i> ' : '';
-            const activeClass = menu.order === 1 ? 'active' : '';
+            const activeClass = menu.order === 0 ? 'active' : '';
             const submenuClass = hasChildren ? 'has-submenu' : '';
             
             // Build class list properly
             const classList = [activeClass, submenuClass].filter(c => c).join(' ');
             
             menuHtml += '<li class="'+ classList +'" data-slug="'+ menu.slug +'">';
-            menuHtml += '<a href="#'+ menu.slug+'">'+ icon + menu.name +'</a>';
+            menuHtml += '<a href="'+ menu.slug+'.html">'+ icon + menu.name +'</a>';
             
             if (hasChildren) {
                 console.log(`Adding submenu for ${menu.name} with ${menu.children.length} children`);

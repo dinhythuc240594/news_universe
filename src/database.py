@@ -7,6 +7,51 @@ import datetime
 
 from config import envConfig as ecf
 
+DEFAULT_CATEGORIES = [
+    {
+        'name': 'Công Nghệ',
+        'slug': 'cong-nghe',
+        'icon': 'phone',
+        'order_display': 1,
+        'parent_id': None,
+    },
+    {
+        'name': 'Kinh tế',
+        'slug': 'kinh-te',
+        'icon': 'economy',
+        'order_display': 2,
+        'parent_id': None,
+    },
+    {
+        'name': 'Thể thao',
+        'slug': 'the-thao',
+        'icon': 'sports',
+        'order_display': 3,
+        'parent_id': None,
+    },
+    {
+        'name': 'Giải trí',
+        'slug': 'giai-tri',
+        'icon': 'entertainment',
+        'order_display': 4,
+        'parent_id': None,
+    },
+    {
+        'name': 'Giáo dục',
+        'slug': 'giao-duc',
+        'icon': 'education',
+        'order_display': 5,
+        'parent_id': None,
+    },
+    {
+        'name': 'Sức khỏe',
+        'slug': 'suc-khoe',
+        'icon': 'health',
+        'order_display': 6,
+        'parent_id': None,
+    }
+]
+
 
 class Base(DeclarativeBase):
     pass

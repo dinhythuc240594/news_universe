@@ -28,6 +28,9 @@
 
     <script>
         MyLang.setSiteLang("{{ site }}");
+        $( document ).ready(function() {
+            UI_CLIENT.homeMainContent();
+        });
     </script>
 
     {% block head %}

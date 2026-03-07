@@ -1,5 +1,88 @@
 menuManager = {
     
+    defaultMenus: [
+        {
+            id: 1,
+            name: 'Công Nghệ',
+            slug: 'dien-thoai',
+            icon: 'phone',
+            order: 1,
+            visible: true,
+            parent_id: null,
+        },
+        {
+            id: 2,
+            name: 'Kinh tế',
+            slug: 'kinh-te',
+            icon: 'economy',
+            order: 2,
+            visible: true,
+            parent_id: null,
+        },
+        {
+            id: 3,
+            name: 'Thể thao',
+            slug: 'the-thao',
+            icon: 'sports',
+            order: 3,
+            visible: true,
+            parent_id: null,
+        },
+        {
+            id: 4,
+            name: 'Giải trí',
+            slug: 'giai-tri',
+            icon: 'entertainment',
+            order: 4,
+            visible: true,
+            parent_id: null,
+        },
+        {
+            id: 5,
+            name: 'Giáo dục',
+            slug: 'giao-duc',
+            icon: 'education',
+            order: 5,
+            visible: true,
+            parent_id: null,
+        },
+        {
+            id: 6,
+            name: 'Sức khỏe',
+            slug: 'suc-khoe',
+            icon: 'health',
+            order: 6,
+            visible: true,
+            parent_id: null,
+        }
+    ],
+
+    menuConfig: {
+        'menu-manager': {
+            apiBase: '/api/menu-items',
+            selectors: {
+                addBtn: '#addMenuBtn',
+                saveBtn: '#saveMenuBtn',
+                resetBtn: '#resetMenuBtn',
+                previewBtn: '#previewMenuBtn',
+                treeList: '#menuTreeList',
+                treeView: '#menuTreeView',
+                modal: '#menuModal',
+                modalTitle: '#menuModalTitle',
+                form: '#menuForm',
+                formId: '#menuId',
+                formName: '#menuName',
+                formSlug: '#menuSlug',
+                formParent: '#menuParent',
+                formIcon: '#menuIcon',
+                formOrder: '#menuOrder',
+                formVisible: '#menuVisible',
+                previewModal: '#previewModal',
+                previewList: '#previewMenuList'
+            }
+        },
+    },
+
     // Initialize menu system
     init: function() {
         if (!localStorage.getItem('vnews_menus')) {
@@ -8,9 +91,41 @@ menuManager = {
     },
 
     // Get all menus
-    getMenus: function() {
-        const menus = localStorage.getItem('vnews_menus');
+    getMenus: async function() {
+        var menus = null;
+        try {
+            const apiBase = menuManager.getApiBase();
+            const response = await fetch(apiBase);
+            const result = await response.json();
+
+            if (result.success && result.data && result.data.length === 0) {
+                const initResponse = await fetch(`${apiBase}/get_menus`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const initResult = await initResponse.json();
+                if (initResult.success) {
+                    menus = initResult.data;
+                }
+            }
+
+        } catch (error) {
+            
+        }
         return menus ? JSON.parse(menus) : this.defaultMenus;
+    },
+
+    getApiBase: function() {
+        var config = menuManager.getMenuConfig();
+        return config.apiBase;
+    },
+
+    getMenuConfig: function() {
+        var activeSection = $('.content-section.active').attr('id');
+        return menuConfig[activeSection] || menuConfig['menu-manager'];
     },
 
     // Get parent menus only
@@ -132,8 +247,8 @@ menuManager = {
     },
 
     // Build hierarchical menu structure
-    buildMenuTree: function() {
-        const menus = this.getMenus();
+    buildMenuTree: async function() {
+        const menus = await menuManager.getMenus();
         const parentMenus = menus.filter(m => m.parent_id === null && m.visible)
                                   .sort((a, b) => a.order - b.order);
         

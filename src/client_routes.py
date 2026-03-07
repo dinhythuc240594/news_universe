@@ -303,6 +303,39 @@ class Guide(controller, base.BaseView):
         return render_template('client/guide.html', **values)
 
 
+class getMenu(controller, base.BaseView):
+
+    def get(self):
+        
+        self.init_menu_item()
+
+        categories = self.db_session.query(Category).order_by(
+            Category.order_display, Category.parent_id
+        ).all()
+        
+        return jsonify({
+            'success': True,
+            'data': [{
+                'id': item.id,
+                'name': item.name,
+                'slug': item.slug,
+                'icon': item.icon,
+                'order': item.order_display,
+                'parent_id': item.parent_id,
+                'level': item.level if hasattr(item, 'level') else 1,
+                'visible': item.visible
+            } for item in categories]
+        })
+
+
+
+class getHtml(controller, base.BaseView):
+
+    def get(self, slug):
+        values = {}
+        slug += '.html'
+        return render_template('client/'+slug, **values)
+
 client_bp.add_url_rule('/', 'home0', Home.as_view('home0'))
 client_bp.add_url_rule('/home', 'home1', Home.as_view('home1'))
 client_bp.add_url_rule('/search', 'search', Search.as_view('search'))
@@ -320,3 +353,9 @@ client_bp.add_url_rule('/security', 'security', Security.as_view('security'))
 client_bp.add_url_rule('/term', 'term_of_service', Term.as_view('term_of_service'))
 client_bp.add_url_rule('/contact', 'contact', Contact.as_view('contact'))
 client_bp.add_url_rule('/guide', 'guide', Guide.as_view('guide'))
+
+# api
+client_bp.add_url_rule('api/get_menus', 'get_menus', getMenu.as_view('get_menus'))
+
+# slug
+client_bp.add_url_rule('/<string:slug>.html', 'slug_page', getHtml.as_view('slug_page'))

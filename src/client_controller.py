@@ -183,3 +183,62 @@ class Controller():
             success_msg = 'Nếu email tồn tại trong hệ thống, chúng tôi đã gửi link đặt lại mật khẩu đến email của bạn.' if site == 'vn' else 'If the email exists in our system, we have sent a password reset link to your email.'
             flash(success_msg, 'success')
             return redirect(url_for('client.user_login', site=site))
+
+    def init_menu_item(self):
+        
+        count = self.db_session.query(db.Category).count()
+        if count > 0:
+            return {
+                'success': False,
+                'error': 'Đã có categories trong database'
+            }
+        
+        created_items = {}
+        parent_categories = [c for c in db.DEFAULT_CATEGORIES if c['parent_id'] is None]
+        parent_categories.sort(key=lambda x: x['order_display'])
+
+        for cat_data in parent_categories:
+            category = db.Category(
+                name=cat_data['name'],
+                slug=cat_data['slug'],
+                icon=cat_data['icon'],
+                order_display=cat_data['order_display'],
+                parent_id=None,
+                visible=True
+            )
+            self.db_session.add(category)
+            self.db_session.flush()  # Để lấy ID
+            created_items[cat_data['slug']] = category.id
+
+        child_categories = [c for c in db.DEFAULT_CATEGORIES if c['parent_id'] is not None]
+        child_categories.sort(key=lambda x: (x['parent_id'], x['order_display']))
+
+        for cat_data in child_categories:
+            parent_slug = None
+            for parent_cat in db.DEFAULT_CATEGORIES:
+                if parent_cat.get('id') == cat_data['parent_id']:
+                    parent_slug = parent_cat['slug']
+                    break
+
+            if parent_slug and parent_slug in created_items:
+                parent_id = created_items[parent_slug]
+                parent_id = created_items[parent_slug]
+                category = db.Category(
+                    name=cat_data['name'],
+                    slug=cat_data['slug'],
+                    icon=cat_data['icon'],
+                    order_display=cat_data['order_display'],
+                    parent_id=parent_id,
+                    visible=True
+                )
+                self.db_session.add(category)
+                self.db_session.flush()
+                created_items[cat_data['slug']] = category.id
+
+        self.db_session.commit()
+
+        return {
+            'success': True,
+            'message': f'Đã khởi tạo {len(db.DEFAULT_CATEGORIES)} categories mặc định',
+            'count': len(db.DEFAULT_CATEGORIES)
+        }
